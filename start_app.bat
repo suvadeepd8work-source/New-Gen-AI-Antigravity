@@ -14,7 +14,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [*] Installing all required Python dependencies...
-pip install pandas datasets pytest fastapi uvicorn groq pydantic python-dotenv httpx
+pip install pandas datasets pytest fastapi uvicorn groq pydantic python-dotenv httpx streamlit requests
 
 echo.
 echo [*] Phase 1: Downloading and Cleaning Zomato Dataset...
@@ -35,8 +35,13 @@ start cmd /k "title FastAPI Backend && python main.py"
 cd ..
 
 echo.
+echo [*] Phase 5: Starting Streamlit Frontend in a new window...
+start cmd /k "title Streamlit Frontend && streamlit run phase5/streamlit_app.py"
+
+echo.
 echo ==================================================
 echo SUCCESS! Everything is running.
+echo FastAPI Backend is on http://localhost:8000
+echo Streamlit UI is opening in your default web browser...
 echo ==================================================
-echo Now, simply double-click the "index.html" file inside the "phase5" folder to open the beautiful UI in your web browser and test it out!
 pause
