@@ -63,7 +63,7 @@ if get_recs_btn:
 
         try:
             # Call the FastAPI backend
-            response = requests.post("http://localhost:8000/api/recommend", json=payload)
+            response = requests.post("http://127.0.0.1:8000/api/recommend", json=payload)
             
             if response.status_code == 200:
                 data = response.json()
