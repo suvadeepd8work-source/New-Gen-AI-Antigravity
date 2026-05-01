@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet AI - Restaurant Recommendations</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Markdown Parser for LLM output -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Gourmet <span class="gradient-text">AI</span></h1>
+            <p>Your personal AI food critic. Discover the perfect dining experience.</p>
+        </header>
+
+        <main class="glass-panel">
+            <form id="recommendation-form">
+                <div class="input-group">
+                    <label for="location">City / Location</label>
+                    <input type="text" id="location" placeholder="e.g., Banashankari">
+                </div>
+                
+                <div class="input-group">
+                    <label for="cuisine">Cuisine Type</label>
+                    <input type="text" id="cuisine" placeholder="e.g., Italian, Cafe, North Indian">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label for="min_rate">Minimum Rating: <span id="rate-value">4.0</span> / 5</label>
+                    </div>
+                    <input type="range" id="min_rate" min="1" max="5" step="0.1" value="4.0">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label for="max_cost">Max Cost for Two (₹): <span id="cost-value">1500</span></label>
+                    </div>
+                    <input type="range" id="max_cost" min="100" max="5000" step="100" value="1500">
+                </div>
+
+                <button type="submit" id="submit-btn">
+                    <span class="btn-text">Get AI Recommendations</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </form>
+        </main>
+
+        <section id="results-container" class="glass-panel hidden">
+            <div id="results-content" class="markdown-body"></div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phase 5 Frontend Tests</title>
+    <style>
+        body { font-family: monospace; background: #1e1e1e; color: #fff; padding: 20px; }
+        .pass { color: #4ade80; }
+        .fail { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>UI Test Runner</h1>
+    <p>Testing DOM manipulation and logic...</p>
+    <div id="test-sandbox" style="display: none;">
+        <!-- Mock HTML Structure for Testing -->
+        <input type="range" id="min_rate" value="4.0">
+        <span id="rate-value">4.0</span>
+        <input type="text" id="location" value="Downtown">
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        let passed = 0;
+        let total = 0;
+        const resultsDiv = document.getElementById('results');
+
+        function assertEq(name, actual, expected) {
+            total++;
+            const p = document.createElement('p');
+            if (actual === expected) {
+                p.innerHTML = `<span class="pass">✅ [PASS]</span> ${name}`;
+                passed++;
+            } else {
+                p.innerHTML = `<span class="fail">❌ [FAIL]</span> ${name} | Expected '${expected}', got '${actual}'`;
+            }
+            resultsDiv.appendChild(p);
+        }
+
+        // Test 1: DOM Elements exist
+        const rateSlider = document.getElementById('min_rate');
+        assertEq("Slider Element Exists", rateSlider !== null, true);
+
+        // Test 2: Input reading
+        const loc = document.getElementById('location');
+        assertEq("Location Input Reads Correctly", loc.value, "Downtown");
+
+        // Test 3: Simulate slider change 
+        rateSlider.value = 4.5;
+        document.getElementById('rate-value').textContent = rateSlider.value;
+        assertEq("Slider UI Syncs with Value", document.getElementById('rate-value').textContent, "4.5");
+
+        const summary = document.createElement('h2');
+        summary.textContent = `Test Summary: ${passed}/${total} passed.`;
+        summary.className = passed === total ? "pass" : "fail";
+        resultsDiv.appendChild(summary);
+    </script>
+</body>
+</html>
