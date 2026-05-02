@@ -158,17 +158,43 @@ if get_recs_btn:
                 recommendation = completion.choices[0].message.content
                 raw_data = df_restaurants.to_dict(orient="records")
                 
+                # Beautiful Header for results
+                st.markdown("---")
+                st.markdown("<h2 style='text-align: center; color: #2c3e50;'>✨ Your Curated Dining Experience</h2>", unsafe_allow_html=True)
+                
+                # Show quick metrics
+                st.markdown("<br>", unsafe_allow_html=True)
+                cols = st.columns(3)
+                with cols[0]:
+                    st.metric("Top Matches Found", len(df_restaurants))
+                with cols[1]:
+                    avg_cost = df_restaurants['approx_cost'].mean()
+                    st.metric("Avg Cost for Two", f"₹{avg_cost:.0f}")
+                with cols[2]:
+                    max_rating = df_restaurants['rate'].max()
+                    st.metric("Highest Rating", f"⭐ {max_rating:.1f}/5")
+                
                 # Display the LLM Recommendation
                 st.markdown("<div class='recommendation-box'>", unsafe_allow_html=True)
-                st.markdown("### ✨ AI's Top Picks")
                 st.markdown(recommendation)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
-                # Display the raw data
-                if raw_data:
-                    with st.expander("📊 View Raw Database Matches"):
-                        df = pd.DataFrame(raw_data)
-                        st.dataframe(df, use_container_width=True)
+                # Display the raw data as beautiful cards
+                st.markdown("<br><h3 style='color: #2c3e50;'>📊 Detailed Database Matches</h3>", unsafe_allow_html=True)
+                for _, row in df_restaurants.iterrows():
+                    st.markdown(f"""
+                    <div style='background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid #e67e22;'>
+                        <h4 style='margin-top: 0; margin-bottom: 8px; color: #d35400;'>{row['name']}</h4>
+                        <div style='display: flex; justify-content: space-between; color: #444;'>
+                            <span><strong>📍 Location:</strong> {row['location']}</span>
+                            <span><strong>⭐ Rating:</strong> {row['rate']} / 5</span>
+                        </div>
+                        <div style='display: flex; justify-content: space-between; color: #444; margin-top: 5px;'>
+                            <span><strong>🍕 Cuisine:</strong> {row['cuisines']}</span>
+                            <span><strong>💰 Cost for Two:</strong> ₹{row['approx_cost']}</span>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
                         
         except Exception as e:
             st.error(f"An unexpected error occurred: {str(e)}")
