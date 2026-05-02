@@ -45,6 +45,7 @@ with st.sidebar:
     
     location = st.text_input("📍 Location", placeholder="e.g., Indiranagar")
     cuisine = st.text_input("🍕 Cuisine", placeholder="e.g., Italian")
+    rest_type = st.text_input("🏪 Restaurant Type", placeholder="e.g., Cafe, Casual Dining")
     
     st.markdown("---")
     min_rate = st.slider("⭐ Minimum Rating", min_value=1.0, max_value=5.0, value=4.0, step=0.1)
@@ -75,7 +76,7 @@ if not api_key:
 
 groq_client = Groq(api_key=api_key)
 
-def filter_restaurants_from_db(min_rate, max_cost, location, cuisine, limit=5):
+def filter_restaurants_from_db(min_rate, max_cost, location, cuisine, rest_type, limit=5):
     """Retrieve filtered restaurants from the SQLite database."""
     # Handle paths for both local and cloud deployment
     db_paths = ["phase2/zomato.db", "../phase2/zomato.db", "zomato.db"]
@@ -104,6 +105,9 @@ def filter_restaurants_from_db(min_rate, max_cost, location, cuisine, limit=5):
     if cuisine:
         query += " AND cuisines LIKE ?"
         params.append(f"%{cuisine}%")
+    if rest_type:
+        query += " AND rest_type LIKE ?"
+        params.append(f"%{rest_type}%")
         
     query += f" LIMIT {limit}"
     
@@ -116,7 +120,7 @@ if get_recs_btn:
     with st.spinner("AI is curating the perfect dining experience for you..."):
         try:
             # 1. Retrieve Data from Database directly
-            df_restaurants = filter_restaurants_from_db(min_rate, max_cost, location, cuisine)
+            df_restaurants = filter_restaurants_from_db(min_rate, max_cost, location, cuisine, rest_type)
             
             if df_restaurants.empty:
                 st.warning("I couldn't find any restaurants matching your specific criteria or the database couldn't be loaded. Could you try adjusting your filters?")
@@ -126,7 +130,8 @@ if get_recs_btn:
                 for _, row in df_restaurants.iterrows():
                     context_str += f"- Name: {row['name']} (Rating: {row['rate']}/5, Cost for two: ~{row['approx_cost']})\n"
                     context_str += f"  Location: {row['location']}\n"
-                    context_str += f"  Cuisines: {row['cuisines']}\n\n"
+                    context_str += f"  Cuisines: {row['cuisines']}\n"
+                    context_str += f"  Type: {row['rest_type']}\n\n"
                     
                 # 3. Prompt Engineering
                 system_prompt = (
@@ -139,7 +144,7 @@ if get_recs_btn:
                 
                 user_prompt = (
                     f"User Preferences -> Min Rating: {min_rate}, Max Cost: {max_cost}, "
-                    f"Location: {location}, Cuisine: {cuisine}\n\n"
+                    f"Location: {location}, Cuisine: {cuisine}, Type: {rest_type}\n\n"
                     f"{context_str}\n\n"
                     f"Please give me your best recommendation based on this!"
                 )
@@ -182,16 +187,25 @@ if get_recs_btn:
                 # Display the raw data as beautiful cards
                 st.markdown("<br><h3 style='color: #2c3e50;'>📊 Detailed Database Matches</h3>", unsafe_allow_html=True)
                 for _, row in df_restaurants.iterrows():
+                    cuisine_keyword = row['cuisines'].split(',')[0].strip()
+                    img_url = f"https://loremflickr.com/600/300/food,{cuisine_keyword}?lock={row['id']}"
+                    
                     st.markdown(f"""
-                    <div style='background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid #e67e22;'>
-                        <h4 style='margin-top: 0; margin-bottom: 8px; color: #d35400;'>{row['name']}</h4>
-                        <div style='display: flex; justify-content: space-between; color: #444;'>
-                            <span><strong>📍 Location:</strong> {row['location']}</span>
-                            <span><strong>⭐ Rating:</strong> {row['rate']} / 5</span>
-                        </div>
-                        <div style='display: flex; justify-content: space-between; color: #444; margin-top: 5px;'>
-                            <span><strong>🍕 Cuisine:</strong> {row['cuisines']}</span>
-                            <span><strong>💰 Cost for Two:</strong> ₹{row['approx_cost']}</span>
+                    <div style='background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(5px); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; overflow: hidden; border: 1px solid #eee;'>
+                        <img src="{img_url}" style="width: 100%; height: 250px; object-fit: cover;" alt="{row['name']}">
+                        <div style="padding: 20px;">
+                            <h4 style='margin-top: 0; margin-bottom: 8px; color: #d35400;'>{row['name']}</h4>
+                            <div style='display: flex; justify-content: space-between; color: #444;'>
+                                <span><strong>📍 Location:</strong> {row['location']}</span>
+                                <span><strong>⭐ Rating:</strong> {row['rate']} / 5</span>
+                            </div>
+                            <div style='display: flex; justify-content: space-between; color: #444; margin-top: 5px;'>
+                                <span><strong>🍕 Cuisine:</strong> {row['cuisines']}</span>
+                                <span><strong>💰 Cost for Two:</strong> ₹{row['approx_cost']}</span>
+                            </div>
+                            <div style='color: #666; margin-top: 8px; font-size: 0.9em; border-top: 1px solid #eee; padding-top: 8px;'>
+                                <span><strong>🏪 Type:</strong> {row['rest_type']}</span>
+                            </div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
