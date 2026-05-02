@@ -45,7 +45,15 @@ with st.sidebar:
     
     location = st.text_input("📍 Location", placeholder="e.g., Indiranagar")
     cuisine = st.text_input("🍕 Cuisine", placeholder="e.g., Italian")
-    rest_type = st.text_input("🏪 Restaurant Type", placeholder="e.g., Cafe, Casual Dining")
+    
+    # Pre-defined list of common Zomato restaurant types
+    REST_TYPES = [
+        "Any", "Casual Dining", "Cafe", "Quick Bites", "Delivery", 
+        "Mess", "Dessert Parlor", "Bakery", "Pub", "Bar", 
+        "Beverage Shop", "Fine Dining", "Lounge", "Food Court", "Kiosk"
+    ]
+    selected_type = st.selectbox("🏪 Restaurant Type", options=REST_TYPES)
+    rest_type = "" if selected_type == "Any" else selected_type
     
     st.markdown("---")
     min_rate = st.slider("⭐ Minimum Rating", min_value=1.0, max_value=5.0, value=4.0, step=0.1)
